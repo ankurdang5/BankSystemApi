@@ -22,7 +22,7 @@ namespace BankSystem.Controllers
             return Ok(accounts);
         }
 
-        [HttpGet("{accountId:int}", Name = "GetAccount")]
+        [HttpGet("GetAccount/{accountId:int}")]
         public async Task<ActionResult<Account>> GetAccount(int accountId)
         {
             var account = await _accountService.GetAccountAsync(accountId);
