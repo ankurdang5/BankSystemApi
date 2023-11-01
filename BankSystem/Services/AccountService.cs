@@ -10,8 +10,8 @@ namespace BankSystem.Services
             _accounts = new Dictionary<int, Account>
             {
                 // Initialize with mock data
-                { 1, new Account { Id = 1, Name = "Rahul Account1", Balance = 5000 } },
-                { 2, new Account { Id = 2, Name = "Rahul Account2", Balance = 3000 } },
+                { 1, new Account { Id = 1, Name = "Ankur Account1", Balance = 5000 } },
+                { 2, new Account { Id = 2, Name = "Ankur Account2", Balance = 3000 } },
                 { 3, new Account { Id = 3, Name = "Jitu Account1", Balance = 10000 } }
             };
         }
