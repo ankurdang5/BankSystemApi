@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/BankSystem
+/BankSystem/bin/Debug/net6.0
+/BankSystem/obj
+/.vs/ProjectEvaluation
+/Tests/bin/Debug/net6.0
+/Tests/obj
