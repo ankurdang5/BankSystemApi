@@ -17,97 +17,153 @@ namespace BankSystem.Services
         }
         public async Task<IEnumerable<Account>> GetAllAccountsAsync()
         {
-            return await Task.FromResult(_accounts.Values);
+            try
+            {
+                return await Task.FromResult(_accounts.Values);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while fetching accounts.", ex);
+            }
         }
         public async Task<Account> GetAccountAsync(int accountId)
         {
-            if (!_accounts.ContainsKey(accountId))
+            try
             {
-                throw new InvalidOperationException("Account not found.");
+                if (!_accounts.ContainsKey(accountId))
+                {
+                    throw new InvalidOperationException("Account not found.");
+                }
+                return await Task.FromResult(_accounts[accountId]);
             }
-            return await Task.FromResult(_accounts[accountId]);
+            catch (Exception ex)
+            {
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while fetching the account.", ex);
+            }
         }
 
         public async Task<Account> CreateAccountAsync(string name, decimal balance)
         {
-            if (balance < 100)
+            try
             {
-                throw new InvalidOperationException("Initial account balance must be at least $100.");
+                if (balance < 100)
+                {
+                    throw new InvalidOperationException("Initial account balance must be at least $100.");
+                }
+                var account = new Account
+                {
+                    Id = _accounts.Keys.Max() + 1,
+                    Name = name,
+                    Balance = balance
+                };
+                _accounts.Add(account.Id, account);
+                return await Task.FromResult(account);
             }
-            var account = new Account
+            catch (Exception ex)
             {
-                Id = _accounts.Keys.Max() + 1,
-                Name = name,
-                Balance = balance
-            };
-            _accounts.Add(account.Id, account);
-            return await Task.FromResult(account);
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while creating the account.", ex);
+            }
         }
 
         public async Task<Account> UpdateAccountAsync(int accountId, string name, decimal balance)
         {
-            if (!_accounts.ContainsKey(accountId))
+            try
             {
-                throw new InvalidOperationException("Account not found.");
+                if (!_accounts.ContainsKey(accountId))
+                {
+                    throw new InvalidOperationException("Account not found.");
+                }
+                var account = _accounts[accountId];
+                account.Name = name;
+                account.Balance = balance;
+                _accounts[accountId] = account;
+                return await Task.FromResult(account);
             }
-            var account = _accounts[accountId];
-            account.Name = name;
-            account.Balance = balance;
-            _accounts[accountId] = account;
-            return await Task.FromResult(account);
+            catch (Exception ex)
+            {
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while updating the account.", ex);
+            }
         }
 
         public async Task DeleteAccountAsync(int accountId)
         {
-            if (!_accounts.ContainsKey(accountId))
+            try
             {
-                return;
+                if (!_accounts.ContainsKey(accountId))
+                {
+                    return;
+                }
+
+                _accounts.Remove(accountId);
+
+                await Task.CompletedTask;
             }
-
-            _accounts.Remove(accountId);
-
-            await Task.CompletedTask;
+            catch (Exception ex)
+            {
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while deleting the account.", ex);
+            }
         }
 
         public async Task<Account> DepositAsync(int accountId, decimal amount)
         {
-            if (!_accounts.ContainsKey(accountId))
+            try
             {
-                throw new InvalidOperationException("Account not found.");
-            }
+                if (!_accounts.ContainsKey(accountId))
+                {
+                    throw new InvalidOperationException("Account not found.");
+                }
 
-            if(amount > 10000)
+                if (amount > 10000)
+                {
+                    throw new InvalidOperationException("Cannot deposit more than $10,000 in a single transaction.");
+                }
+
+                var account = _accounts[accountId];
+                account.Balance += amount;
+
+                _accounts[accountId] = account;
+
+                return await Task.FromResult(account);
+            }
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("Cannot deposit more than $10,000 in a single transaction.");
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while making a deposit into the account.", ex);
             }
-
-            var account = _accounts[accountId];
-            account.Balance += amount;
-
-            _accounts[accountId] = account;
-
-            return await Task.FromResult(account);
         }
 
         public async Task<Account> WithdrawAsync(int accountId, decimal amount)
         {
-            if (!_accounts.ContainsKey(accountId))
+            try
             {
-                throw new InvalidOperationException("Account not found.");
-            }
-            var account = _accounts[accountId];
+                if (!_accounts.ContainsKey(accountId))
+                {
+                    throw new InvalidOperationException("Account not found.");
+                }
+                var account = _accounts[accountId];
 
-            if (amount > account.Balance * 0.9m)
-            {
-                throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
+                if (amount > account.Balance * 0.9m)
+                {
+                    throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
+                }
+                if (account.Balance - amount < 100)
+                {
+                    throw new InvalidOperationException("Account balance cannot be less than $100.");
+                }
+                account.Balance -= amount;
+                _accounts[accountId] = account;
+                return await Task.FromResult(account);
             }
-            if (account.Balance - amount < 100)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("Account balance cannot be less than $100.");
+                // Log the exception and throw a custom exception
+                throw new CustomServiceException("An error occurred while making a withdrawal from the account.", ex);
             }
-            account.Balance -= amount;
-            _accounts[accountId] = account;
-            return await Task.FromResult(account);
         }
     }
 }

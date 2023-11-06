@@ -16,14 +16,14 @@ namespace BankSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
+        public async Task<ActionResult<IEnumerable<Account>>> Account()
         {
             var accounts = await _accountService.GetAllAccountsAsync();
             return Ok(accounts);
         }
 
         [HttpGet("GetAccount/{accountId:int}")]
-        public async Task<ActionResult<Account>> GetAccount(int accountId)
+        public async Task<ActionResult<Account>> Account(int accountId)
         {
             var account = await _accountService.GetAccountAsync(accountId);
             if (account == null)
@@ -35,7 +35,7 @@ namespace BankSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Account>> CreateAccount([FromBody] CreateAccountRequest request)
+        public async Task<ActionResult<Account>> Account([FromBody] CreateAccountRequest request)
         {
             if (request == null)
             {
@@ -47,7 +47,7 @@ namespace BankSystem.Controllers
         }
 
         [HttpPut("{accountId}")]
-        public async Task<ActionResult<Account>> UpdateAccount(int accountId, [FromBody] UpdateAccountRequest request)
+        public async Task<ActionResult<Account>> Account(int accountId, [FromBody] UpdateAccountRequest request)
         {
             if (request == null)
             {
@@ -62,7 +62,7 @@ namespace BankSystem.Controllers
         }
 
         [HttpDelete("{accountId}")]
-        public async Task<ActionResult> DeleteAccount(int accountId)
+        public async Task<ActionResult> Delete(int accountId)
         {
             await _accountService.DeleteAccountAsync(accountId);
             return NoContent();
