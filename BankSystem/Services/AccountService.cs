@@ -21,10 +21,10 @@ namespace BankSystem.Services
             {
                 return await Task.FromResult(_accounts.Values);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while fetching accounts.", ex);
+                throw;
             }
         }
         public async Task<Account> GetAccountAsync(int accountId)
@@ -37,10 +37,10 @@ namespace BankSystem.Services
                 }
                 return await Task.FromResult(_accounts[accountId]);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while fetching the account.", ex);
+                throw;
             }
         }
 
@@ -61,10 +61,9 @@ namespace BankSystem.Services
                 _accounts.Add(account.Id, account);
                 return await Task.FromResult(account);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while creating the account.", ex);
+                throw;
             }
         }
 
@@ -82,10 +81,10 @@ namespace BankSystem.Services
                 _accounts[accountId] = account;
                 return await Task.FromResult(account);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while updating the account.", ex);
+                throw;
             }
         }
 
@@ -102,10 +101,10 @@ namespace BankSystem.Services
 
                 await Task.CompletedTask;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while deleting the account.", ex);
+                throw;
             }
         }
 
@@ -130,10 +129,10 @@ namespace BankSystem.Services
 
                 return await Task.FromResult(account);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while making a deposit into the account.", ex);
+                throw;
             }
         }
 
@@ -159,10 +158,10 @@ namespace BankSystem.Services
                 _accounts[accountId] = account;
                 return await Task.FromResult(account);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Log the exception and throw a custom exception
-                throw new CustomServiceException("An error occurred while making a withdrawal from the account.", ex);
+                throw;
             }
         }
     }
