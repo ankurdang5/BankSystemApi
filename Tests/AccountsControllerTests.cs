@@ -48,5 +48,61 @@ namespace Tests
             var account = (Account)createdAtResult.Value;
             Assert.IsNotNull(account);
         }
+
+        [TestMethod]
+        public async Task UpdateAccount_ExistingAccountId_ReturnsAccount()
+        {
+            var accountId = 2;
+            var request = new UpdateAccountRequest
+            {
+                Name = "TestAccount",
+                Balance = 6969.0m,
+            };
+            var accountService = new AccountService();
+            var controller = new AccountsController(accountService);
+            var result = await controller.Account(accountId,request);
+            var account = result.Value;
+            Assert.IsInstanceOfType(account, typeof(Account));
+        }
+
+        [TestMethod]
+        public async Task DeleteAccount_ExistingAccountId()
+        {
+            var accountId = 3;
+            var accountService = new AccountService();
+            var controller = new AccountsController(accountService);
+            var result = await controller.Delete(accountId);
+            Assert.IsInstanceOfType(result, typeof(NoContentResult));
+        }
+
+        [TestMethod]
+        public async Task DepositAccount_ExistingAccountId_ReturnsAccount()
+        {
+            var accountId = 1;
+            var request = new DepositRequest
+            {
+                Amount = 2000.0m,
+            };
+            var accountService = new AccountService();
+            var controller = new AccountsController(accountService);
+            var result = await controller.Deposit(accountId, request);
+            var account = result.Value;
+            Assert.IsInstanceOfType(account, typeof(Account));
+        }
+
+        [TestMethod]
+        public async Task WithdrawAccount_ExistingAccountId_ReturnsAccount()
+        {
+            var accountId = 3;
+            var request = new WithdrawRequest
+            {
+                Amount = 2000.0m,
+            };
+            var accountService = new AccountService();
+            var controller = new AccountsController(accountService);
+            var result = await controller.Withdraw(accountId, request);
+            var account = result.Value;
+            Assert.IsInstanceOfType(account, typeof(Account));
+        }
     }
 }

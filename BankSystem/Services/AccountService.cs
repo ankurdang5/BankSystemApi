@@ -23,7 +23,6 @@ namespace BankSystem.Services
             }
             catch (Exception)
             {
-                // Log the exception and throw a custom exception
                 throw;
             }
         }
@@ -39,7 +38,6 @@ namespace BankSystem.Services
             }
             catch (Exception)
             {
-                // Log the exception and throw a custom exception
                 throw;
             }
         }
@@ -83,7 +81,6 @@ namespace BankSystem.Services
             }
             catch (Exception)
             {
-                // Log the exception and throw a custom exception
                 throw;
             }
         }
@@ -103,7 +100,6 @@ namespace BankSystem.Services
             }
             catch (Exception)
             {
-                // Log the exception and throw a custom exception
                 throw;
             }
         }
@@ -131,7 +127,6 @@ namespace BankSystem.Services
             }
             catch (Exception)
             {
-                // Log the exception and throw a custom exception
                 throw;
             }
         }
@@ -160,7 +155,6 @@ namespace BankSystem.Services
             }
             catch (Exception)
             {
-                // Log the exception and throw a custom exception
                 throw;
             }
         }
