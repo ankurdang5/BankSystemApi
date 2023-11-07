@@ -35,7 +35,7 @@ namespace BankSystem.Controllers
         }
 
         [HttpGet("GetAccount/{accountId:int}")]
-        public async Task<ActionResult<Account>> Account(int accountId)
+        public async Task<ActionResult<Account>> Account(string accountId)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace BankSystem.Controllers
                 {
                     return BadRequest("Invalid request data.");
                 }
-                var account = await _accountService.CreateAccountAsync(request.Name, request.Balance);
+                var account = await _accountService.CreateAccountAsync(request.Id,request.UserName,request.PanCard, request.Balance);
 
                 return CreatedAtAction("GetAccount", new { accountId = account.Id }, account);
             }
@@ -76,32 +76,8 @@ namespace BankSystem.Controllers
             }
         }
 
-        [HttpPut("{accountId}")]
-        public async Task<ActionResult<Account>> Account(int accountId, [FromBody] UpdateAccountRequest request)
-        {
-            try
-            {
-                if (request == null)
-                {
-                    return BadRequest("Invalid request data.");
-                }
-                var account = await _accountService.UpdateAccountAsync(accountId, request.Name, request.Balance);
-                if (account == null)
-                {
-                    return NotFound();
-                }
-                return account;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception and return an error response
-                _logger.LogError(ex, "An error occurred while updating the account.");
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpDelete("{accountId}")]
-        public async Task<ActionResult> Delete(int accountId)
+        public async Task<ActionResult> Delete(string accountId)
         {
             try
             {
@@ -117,7 +93,7 @@ namespace BankSystem.Controllers
         }
 
         [HttpPost("{accountId}/deposit")]
-        public async Task<ActionResult<Account>> Deposit(int accountId, [FromBody] DepositRequest request)
+        public async Task<ActionResult<Account>> Deposit(string accountId, [FromBody] DepositRequest request)
         {
             try
             {
@@ -141,7 +117,7 @@ namespace BankSystem.Controllers
         }
 
         [HttpPost("{accountId}/withdraw")]
-        public async Task<ActionResult<Account>> Withdraw(int accountId, [FromBody] WithdrawRequest request)
+        public async Task<ActionResult<Account>> Withdraw(string accountId, [FromBody] WithdrawRequest request)
         {
             try
             {

@@ -3,38 +3,44 @@ namespace BankSystem.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IDictionary<int, Account> _accounts;
+        private static readonly List<Account> _accounts;
+        public readonly IUserService _userService;
 
-        public AccountService()
+        static AccountService()
         {
-            _accounts = new Dictionary<int, Account>
-            {
-                // Initialize with mock data
-                { 1, new Account { Id = 1, Name = "Ankur Account1", Balance = 5000 } },
-                { 2, new Account { Id = 2, Name = "Ankur Account2", Balance = 3000 } },
-                { 3, new Account { Id = 3, Name = "Jitu Account1", Balance = 10000 } }
-            };
+            _accounts = new List<Account>
+                {
+                    new Account { Id = Guid.NewGuid().ToString(), User = new User { Id = "SBI001" }, Balance = 5000 },
+                    new Account { Id = Guid.NewGuid().ToString(), User = new User { Id = "SBI001" }, Balance = 3000 },
+                    new Account { Id = Guid.NewGuid().ToString(), User = new User { Id = "SBI002" }, Balance = 10000 }
+                };
+        }
+
+        public AccountService(IUserService userService)
+        {
+            _userService  = userService;
         }
         public async Task<IEnumerable<Account>> GetAllAccountsAsync()
         {
             try
             {
-                return await Task.FromResult(_accounts.Values);
+                return await Task.FromResult(_accounts);
             }
             catch (Exception)
             {
                 throw;
             }
         }
-        public async Task<Account> GetAccountAsync(int accountId)
+        public async Task<Account> GetAccountAsync(string accountId)
         {
             try
             {
-                if (!_accounts.ContainsKey(accountId))
+                var accountdetail = await Task.FromResult(_accounts.FirstOrDefault(x => x.Id == accountId));
+                if (accountdetail == null)
                 {
                     throw new InvalidOperationException("Account not found.");
                 }
-                return await Task.FromResult(_accounts[accountId]);
+                return accountdetail;
             }
             catch (Exception)
             {
@@ -42,7 +48,7 @@ namespace BankSystem.Services
             }
         }
 
-        public async Task<Account> CreateAccountAsync(string name, decimal balance)
+        public async Task<Account> CreateAccountAsync(string userid, string userName, string panCard, decimal balance)
         {
             try
             {
@@ -50,13 +56,26 @@ namespace BankSystem.Services
                 {
                     throw new InvalidOperationException("Initial account balance must be at least $100.");
                 }
+                User user= new User();
+                if (string.IsNullOrEmpty(userid))
+                {
+                    if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(panCard))
+                    {
+                        throw new InvalidOperationException("Pan card or name should be present");
+                    }
+                    user.Name = userName;
+                    user.PanCard = panCard;
+                    user = await _userService.CreateUserAsync(user);
+                }
+                var newAccountId = Guid.NewGuid().ToString();
                 var account = new Account
                 {
-                    Id = _accounts.Keys.Max() + 1,
-                    Name = name,
+                    Id = newAccountId,
+                    User = user,
                     Balance = balance
                 };
-                _accounts.Add(account.Id, account);
+
+                _accounts.Add(account);
                 return await Task.FromResult(account);
             }
             catch (Exception)
@@ -65,19 +84,15 @@ namespace BankSystem.Services
             }
         }
 
-        public async Task<Account> UpdateAccountAsync(int accountId, string name, decimal balance)
+        public async Task DeleteAccountAsync(string accountId)
         {
             try
             {
-                if (!_accounts.ContainsKey(accountId))
+                var accountToDelete = await Task.FromResult(_accounts.FirstOrDefault(account => account.Id == accountId));
+                if (accountToDelete != null)
                 {
-                    throw new InvalidOperationException("Account not found.");
+                    _accounts.Remove(accountToDelete);
                 }
-                var account = _accounts[accountId];
-                account.Name = name;
-                account.Balance = balance;
-                _accounts[accountId] = account;
-                return await Task.FromResult(account);
             }
             catch (Exception)
             {
@@ -85,32 +100,13 @@ namespace BankSystem.Services
             }
         }
 
-        public async Task DeleteAccountAsync(int accountId)
+        public async Task<Account> DepositAsync(string accountId, decimal amount)
         {
             try
             {
-                if (!_accounts.ContainsKey(accountId))
+                if (amount <= 0)
                 {
-                    return;
-                }
-
-                _accounts.Remove(accountId);
-
-                await Task.CompletedTask;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<Account> DepositAsync(int accountId, decimal amount)
-        {
-            try
-            {
-                if (!_accounts.ContainsKey(accountId))
-                {
-                    throw new InvalidOperationException("Account not found.");
+                    throw new InvalidOperationException("amount should be greater than 0");
                 }
 
                 if (amount > 10000)
@@ -118,10 +114,8 @@ namespace BankSystem.Services
                     throw new InvalidOperationException("Cannot deposit more than $10,000 in a single transaction.");
                 }
 
-                var account = _accounts[accountId];
+                var account = await GetAccountAsync(accountId);
                 account.Balance += amount;
-
-                _accounts[accountId] = account;
 
                 return await Task.FromResult(account);
             }
@@ -131,26 +125,27 @@ namespace BankSystem.Services
             }
         }
 
-        public async Task<Account> WithdrawAsync(int accountId, decimal amount)
+        public async Task<Account> WithdrawAsync(string accountId, decimal amount)
         {
             try
             {
-                if (!_accounts.ContainsKey(accountId))
+                if (amount <= 0)
                 {
-                    throw new InvalidOperationException("Account not found.");
+                    throw new InvalidOperationException("Amount should be greater than 0.");
                 }
-                var account = _accounts[accountId];
+                var account = await GetAccountAsync(accountId);
 
                 if (amount > account.Balance * 0.9m)
                 {
                     throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
                 }
+
                 if (account.Balance - amount < 100)
                 {
                     throw new InvalidOperationException("Account balance cannot be less than $100.");
                 }
+
                 account.Balance -= amount;
-                _accounts[accountId] = account;
                 return await Task.FromResult(account);
             }
             catch (Exception)

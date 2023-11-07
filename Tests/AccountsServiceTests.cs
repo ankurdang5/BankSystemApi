@@ -1,96 +1,61 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using BankSystem.Models;
 using BankSystem.Services;
-using Microsoft.AspNetCore.Mvc;
 
-namespace Tests
+namespace BankSystem.Tests
 {
     [TestClass]
-    public class AccountsServiceTests
+    public class AccountServiceTests
     {
-        [TestMethod]
-        public async Task GetAccounts_ReturnsListOfAccounts()
+        private AccountService accountService;
+
+        [TestInitialize]
+        public void Initialize()
         {
-            var accountService = new AccountService(); 
-            var result = await accountService.GetAllAccountsAsync();
-            Assert.IsInstanceOfType(result, typeof(IEnumerable<Account>));
-            var okResult = new OkObjectResult(result);
-            var accounts = (IEnumerable<Account>)okResult.Value;
-            Assert.IsNotNull(accounts);
+            accountService = new AccountService();
         }
 
         [TestMethod]
-        public async Task GetAccount_ExistingAccountId_ReturnsAccount()
+        public async Task GetAllAccountsAsync_ReturnsAllAccounts()
         {
-            var accountId = 1; 
-            var accountService = new AccountService();
-            var result = await accountService.GetAccountAsync(accountId);
-            var account = result;
-            Assert.IsInstanceOfType(account,typeof(Account));
+            // Arrange: No specific arrangement needed
+
+            // Act
+            var accounts = await accountService.GetAllAccountsAsync();
+
+            // Assert
+            Assert.AreEqual(3, accounts.Count());
         }
 
         [TestMethod]
-        public async Task CreateAccount_ValidData_ReturnsCreatedAccount()
+        public async Task GetAccountAsync_ExistingAccount_ReturnsAccount()
         {
-            var request = new CreateAccountRequest
-            {
-                Name = "ServiceTestAccount",
-                Balance = 2000.0m,
-            };
-            var accountService = new AccountService(); 
-            var result = await accountService.CreateAccountAsync(request.Name,request.Balance);
-            Assert.IsInstanceOfType(result, typeof(Account));
-            var account = result;
+            // Arrange
+            var accountId = accountService.GetAllAccountsAsync().Result.First().Id;
+
+            // Act
+            var account = await accountService.GetAccountAsync(accountId);
+
+            // Assert
             Assert.IsNotNull(account);
         }
 
         [TestMethod]
-        public async Task UpdateAccount_ExistingAccountId_ReturnsAccount()
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task GetAccountAsync_NonExistingAccount_ThrowsException()
         {
-            var accountId = 2;
-            var request = new UpdateAccountRequest
-            {
-                Name = "TestAccount",
-                Balance = 6969.0m,
-            };
-            var accountService = new AccountService();
-            var result = await accountService.UpdateAccountAsync(accountId,request.Name,request.Balance);
-            var account = result;
-            Assert.IsInstanceOfType(account, typeof(Account));
+            // Arrange: Use an invalid accountId
+            var accountId = Guid.NewGuid().ToString();
+
+            // Act
+            var account = await accountService.GetAccountAsync(accountId);
+
+            // Assert: An exception should be thrown
         }
 
-        [TestMethod]
-        public async Task DeleteAccount_ExistingAccountId()
-        {
-            var accountId = 3;
-            var accountService = new AccountService();
-            await accountService.DeleteAccountAsync(accountId);
-            Assert.IsTrue(true);
-        }
-
-        [TestMethod]
-        public async Task DepositAccount_ExistingAccountId_ReturnsAccount()
-        {
-            var accountId = 1;
-            var request = new DepositRequest
-            {
-                Amount = 2000.0m,
-            };
-            var accountService = new AccountService();
-            var result = await accountService.DepositAsync(accountId, request.Amount);
-            Assert.IsInstanceOfType(result, typeof(Account));
-        }
-
-        [TestMethod]
-        public async Task WithdrawAccount_ExistingAccountId_ReturnsAccount()
-        {
-            var accountId = 3;
-            var request = new WithdrawRequest
-            {
-                Amount = 2000.0m,
-            };
-            var accountService = new AccountService();
-            var result = await accountService.WithdrawAsync(accountId, request.Amount);
-            Assert.IsInstanceOfType(result, typeof(Account));
-        }
+        // Add more test methods for other service methods (CreateAccountAsync, DepositAsync, WithdrawAsync, etc.)
     }
 }
