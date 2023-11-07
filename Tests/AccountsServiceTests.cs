@@ -40,7 +40,6 @@ namespace Tests
                 Balance = 2000.0m,
             };
             var accountService = new AccountService(); 
-            //var controller = new AccountsController(accountService);
             var result = await accountService.CreateAccountAsync(request.Name,request.Balance);
             Assert.IsInstanceOfType(result, typeof(Account));
             var account = result;
