@@ -9,10 +9,13 @@ namespace BankSystem.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IAccountService _accountService;
+        private readonly ILogger<AccountsController> _logger;
 
-        public AccountsController(IAccountService accountService)
+
+        public AccountsController(IAccountService accountService, ILogger<AccountsController> logger)
         {
             _accountService = accountService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -26,7 +29,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while getting accounts.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -46,7 +50,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while getting the account.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -66,7 +71,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while creating the account.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -89,7 +95,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while updating the account.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -104,7 +111,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while deleting the account.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -127,7 +135,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while Depositing in the account.");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -150,7 +159,8 @@ namespace BankSystem.Controllers
             catch (Exception ex)
             {
                 // Log the exception and return an error response
-                return StatusCode(500, ex.Message);
+                _logger.LogError(ex, "An error occurred while Withdrawing from the account.");
+                return BadRequest(ex.Message);
             }
         }
     }
