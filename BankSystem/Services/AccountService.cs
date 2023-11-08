@@ -7,11 +7,6 @@ namespace BankSystem.Services
         private readonly List<Account> accountList;
         public readonly IUserService _userService;
 
-        static AccountService()
-        {
-
-        }
-
         public AccountService(IUserService userService)
         {
             accountList = new List<Account>
