@@ -2,15 +2,14 @@
 This is an ASP.NET Core Web API controller designed to manage bank accounts and implement basic banking operations in line with the specified business requirements.
 
 **Swagger Endpoints**
-![image](https://github.com/RahulGo8u/BankSystemAPI/assets/44201543/ef12fe8c-0c44-498a-8354-571e2c4e8172)
+![image](https://github.com/ankurdang5/BankSystemApi/blob/main/BankApi.png)
 
-- `GET /api/bank` - Retrieve a list of all accounts.
-- `GET /api/bank/{accountId}` - Retrieve details of a specific account.
-- `POST /api/bank` - Create a new bank account.
-- `PUT /api/bank/{accountId}` - Update an existing account.
-- `DELETE /api/bank/{accountId}` - Delete an account.
-- `POST /api/bank/{accountId}/deposit` - Deposit funds into an account.
-- `POST /api/bank/{accountId}/withdraw` - Withdraw funds from an account.
+- `GET /api/Accounts` - Retrieve a list of all accounts.
+- `GET /api/Accounts/GetAccount/{accountId}` - Retrieve details of a specific account.
+- `POST /api/Accounts` - Create a new bank account.
+- `DELETE /api/Accounts/{accountId}` - Delete an account.
+- `POST /api/Accounts/{accountId}/deposit` - Deposit funds into an account.
+- `POST /api/Accounts/{accountId}/withdraw` - Withdraw funds from an account.
 
 **Schemas**
 
