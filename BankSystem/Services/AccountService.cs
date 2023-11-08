@@ -69,6 +69,10 @@ namespace BankSystem.Services
                     user.PanCard = panCard;
                     user = await _userService.CreateUserAsync(user);
                 }
+                else
+                {
+                    user = await _userService.GetUserAsync(userid);
+                }
                 var newAccountId = Helper.GetNextAccountID(accountList);
                 var account = new Account
                 {

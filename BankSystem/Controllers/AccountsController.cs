@@ -78,7 +78,7 @@ namespace BankSystem.Controllers
                 {
                     return BadRequest("Invalid request data.");
                 }
-                var account = await _accountService.CreateAccountAsync(request.Id, request.UserName, request.PanCard, request.Balance);
+                var account = await _accountService.CreateAccountAsync(request.Userid, request.UserName, request.PanCard, request.Balance);
 
                 return CreatedAtAction("Account", new { accountId = account.Id }, account);
             }
