@@ -137,13 +137,14 @@ namespace BankSystem.Services
                 }
                 var account = await GetAccountAsync(accountId);
 
-                if (account.Balance - amount < 100)
-                {
-                    throw new InvalidOperationException("Account balance cannot be less than $100.");
-                }
+
                 if (amount > account.Balance * 0.9m)
                 {
                     throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
+                }
+                if (account.Balance - amount < 100)
+                {
+                    throw new InvalidOperationException("Account balance cannot be less than $100.");
                 }
                 account.Balance -= amount;
                 return await Task.FromResult(account);
