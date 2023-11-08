@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankSystem.Controllers
 {
+    /// <summary>
+    /// Accounts Controller class
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
@@ -11,7 +14,11 @@ namespace BankSystem.Controllers
         private readonly IAccountService _accountService;
         private readonly ILogger<AccountsController> _logger;
 
-
+        /// <summary>
+        /// AccountsController Constructor
+        /// </summary>
+        /// <param name="accountService"></param>
+        /// <param name="logger"></param>
         public AccountsController(IAccountService accountService, ILogger<AccountsController> logger)
         {
             _accountService = accountService;
