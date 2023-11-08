@@ -30,10 +30,10 @@ namespace BankSystem.Tests
         public async Task GetAccounts_ShouldReturnListOfAccounts()
         {
             var accounts = new List<Account>
-    {
-        new Account { Id = "ACC001", User = new User { Id = "SBI001" }, Balance = 1000 },
-        new Account { Id = "ACC002", User = new User { Id = "SBI002" }, Balance = 2000 }
-    };
+            {
+                new Account { Id = "ACC001", User = new User { Id = "SBI001" }, Balance = 1000 },
+                new Account { Id = "ACC002", User = new User { Id = "SBI002" }, Balance = 2000 }
+            };
 
             _accountServiceMock.Setup(x => x.GetAllAccountsAsync()).ReturnsAsync(accounts);
 
