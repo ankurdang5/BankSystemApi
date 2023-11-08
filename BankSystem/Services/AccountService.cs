@@ -16,9 +16,9 @@ namespace BankSystem.Services
         {
             accountList = new List<Account>
             {
-                new Account { Id = "ACC001", User = new User { Id = "SBI001" }, Balance = 5000 },
-                new Account { Id = "ACC002", User = new User { Id = "SBI001" }, Balance = 150 },
-                new Account { Id = "ACC003", User = new User { Id = "SBI002" }, Balance = 10000 }
+                new Account { Id = "ACC001", User = new User { Id = "SBI001", Name = "Ankur", PanCard = "QWERTY" }, Balance = 5000 },
+                new Account { Id = "ACC002", User = new User { Id = "SBI001", Name = "Ankur", PanCard = "QWERTY" }, Balance = 150 },
+                new Account { Id = "ACC003", User = new User { Id = "SBI002", Name = "Rohan", PanCard = "ZXCVBN" }, Balance = 10000 }
             };
             _userService = userService;
         }
