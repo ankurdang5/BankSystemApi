@@ -18,6 +18,10 @@ namespace BankSystem.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Get all the accounts
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Account>>> Account()
         {
@@ -34,6 +38,11 @@ namespace BankSystem.Controllers
             }
         }
 
+        /// <summary>
+        /// Get the account details based on accountid
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         [HttpGet("GetAccount/{accountId}")]
         public async Task<ActionResult<Account>> Account(string accountId)
         {
@@ -55,6 +64,11 @@ namespace BankSystem.Controllers
             }
         }
 
+        /// <summary>
+        /// Create a new account
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Account>> Account([FromBody] CreateAccountRequest request)
         {
@@ -76,6 +90,11 @@ namespace BankSystem.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete the account
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         [HttpDelete("{accountId}")]
         public async Task<ActionResult> Delete(string accountId)
         {
@@ -92,6 +111,12 @@ namespace BankSystem.Controllers
             }
         }
 
+        /// <summary>
+        /// Deposit the amount in the bank
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("{accountId}/deposit")]
         public async Task<ActionResult<Account>> Deposit(string accountId, [FromBody] DepositRequest request)
         {
@@ -116,6 +141,12 @@ namespace BankSystem.Controllers
             }
         }
 
+        /// <summary>
+        /// Withdraw the amount from the bank account
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("{accountId}/withdraw")]
         public async Task<ActionResult<Account>> Withdraw(string accountId, [FromBody] WithdrawRequest request)
         {
