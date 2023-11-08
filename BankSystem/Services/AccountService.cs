@@ -1,30 +1,32 @@
-﻿using BankSystem.Models;
+﻿using BankSystem.Common;
+using BankSystem.Models;
 namespace BankSystem.Services
 {
     public class AccountService : IAccountService
     {
-        private static readonly List<Account> _accounts;
+        private readonly List<Account> accountList;
         public readonly IUserService _userService;
 
         static AccountService()
         {
-            _accounts = new List<Account>
-                {
-                    new Account { Id = Guid.NewGuid().ToString(), User = new User { Id = "SBI001" }, Balance = 5000 },
-                    new Account { Id = Guid.NewGuid().ToString(), User = new User { Id = "SBI001" }, Balance = 3000 },
-                    new Account { Id = Guid.NewGuid().ToString(), User = new User { Id = "SBI002" }, Balance = 10000 }
-                };
+
         }
 
         public AccountService(IUserService userService)
         {
-            _userService  = userService;
+            accountList = new List<Account>
+            {
+                new Account { Id = "ACC001", User = new User { Id = "SBI001" }, Balance = 5000 },
+                new Account { Id = "ACC002", User = new User { Id = "SBI001" }, Balance = 150 },
+                new Account { Id = "ACC003", User = new User { Id = "SBI002" }, Balance = 10000 }
+            };
+            _userService = userService;
         }
         public async Task<IEnumerable<Account>> GetAllAccountsAsync()
         {
             try
             {
-                return await Task.FromResult(_accounts);
+                return await Task.FromResult(accountList);
             }
             catch (Exception)
             {
@@ -35,7 +37,7 @@ namespace BankSystem.Services
         {
             try
             {
-                var accountdetail = await Task.FromResult(_accounts.FirstOrDefault(x => x.Id == accountId));
+                var accountdetail = await Task.FromResult(accountList.FirstOrDefault(x => x.Id == accountId));
                 if (accountdetail == null)
                 {
                     throw new InvalidOperationException("Account not found.");
@@ -56,7 +58,7 @@ namespace BankSystem.Services
                 {
                     throw new InvalidOperationException("Initial account balance must be at least $100.");
                 }
-                User user= new User();
+                User user = new User();
                 if (string.IsNullOrEmpty(userid))
                 {
                     if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(panCard))
@@ -67,7 +69,7 @@ namespace BankSystem.Services
                     user.PanCard = panCard;
                     user = await _userService.CreateUserAsync(user);
                 }
-                var newAccountId = Guid.NewGuid().ToString();
+                var newAccountId = Helper.GetNextAccountID(accountList);
                 var account = new Account
                 {
                     Id = newAccountId,
@@ -75,7 +77,7 @@ namespace BankSystem.Services
                     Balance = balance
                 };
 
-                _accounts.Add(account);
+                accountList.Add(account);
                 return await Task.FromResult(account);
             }
             catch (Exception)
@@ -88,10 +90,10 @@ namespace BankSystem.Services
         {
             try
             {
-                var accountToDelete = await Task.FromResult(_accounts.FirstOrDefault(account => account.Id == accountId));
+                var accountToDelete = await Task.FromResult(accountList.FirstOrDefault(account => account.Id == accountId));
                 if (accountToDelete != null)
                 {
-                    _accounts.Remove(accountToDelete);
+                    accountList.Remove(accountToDelete);
                 }
             }
             catch (Exception)
@@ -135,16 +137,14 @@ namespace BankSystem.Services
                 }
                 var account = await GetAccountAsync(accountId);
 
-                if (amount > account.Balance * 0.9m)
-                {
-                    throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
-                }
-
                 if (account.Balance - amount < 100)
                 {
                     throw new InvalidOperationException("Account balance cannot be less than $100.");
                 }
-
+                if (amount > account.Balance * 0.9m)
+                {
+                    throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
+                }
                 account.Balance -= amount;
                 return await Task.FromResult(account);
             }

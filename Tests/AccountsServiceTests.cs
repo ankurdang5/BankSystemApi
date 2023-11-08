@@ -4,58 +4,119 @@ using System.Linq;
 using System.Threading.Tasks;
 using BankSystem.Models;
 using BankSystem.Services;
+using Moq;
 
 namespace BankSystem.Tests
 {
     [TestClass]
     public class AccountServiceTests
     {
-        private AccountService accountService;
+        private AccountService _accountService;
+        private Mock<IUserService> _userServiceMock;
 
         [TestInitialize]
         public void Initialize()
         {
-            accountService = new AccountService();
+            _userServiceMock = new Mock<IUserService>();
+            _accountService = new AccountService(_userServiceMock.Object);
         }
-
         [TestMethod]
-        public async Task GetAllAccountsAsync_ReturnsAllAccounts()
+        public async Task CreateAccountAsync_WithValidInput_ShouldCreateAccount()
         {
-            // Arrange: No specific arrangement needed
+            var newUser = new User { Name = "Raj", PanCard = "ABCD1234" };
+            _userServiceMock.Setup(x => x.CreateUserAsync(It.IsAny<User>())).ReturnsAsync(newUser);
 
-            // Act
-            var accounts = await accountService.GetAllAccountsAsync();
-
-            // Assert
-            Assert.AreEqual(3, accounts.Count());
-        }
-
-        [TestMethod]
-        public async Task GetAccountAsync_ExistingAccount_ReturnsAccount()
-        {
-            // Arrange
-            var accountId = accountService.GetAllAccountsAsync().Result.First().Id;
-
-            // Act
-            var account = await accountService.GetAccountAsync(accountId);
+            var account = await _accountService.CreateAccountAsync(null, "John", "ABCD1234", 1000);
 
             // Assert
             Assert.IsNotNull(account);
+            Assert.AreEqual("ACC004", account.Id); // Assumes Helper.GetNextAccountID(accountList) returns "ACC004"
+            Assert.AreEqual(newUser, account.User);
+            Assert.AreEqual(1000, account.Balance);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task GetAccountAsync_NonExistingAccount_ThrowsException()
+        public async Task CreateAccountAsync_WithInvalidBalance_ShouldThrowException()
         {
-            // Arrange: Use an invalid accountId
-            var accountId = Guid.NewGuid().ToString();
-
-            // Act
-            var account = await accountService.GetAccountAsync(accountId);
-
-            // Assert: An exception should be thrown
+            await _accountService.CreateAccountAsync(null, "John", "ABCD1234", 50); // Balance < 100 should throw an exception
         }
 
-        // Add more test methods for other service methods (CreateAccountAsync, DepositAsync, WithdrawAsync, etc.)
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task CreateAccountAsync_WithMissingUserNameAndPanCard_ShouldThrowException()
+        {
+            await _accountService.CreateAccountAsync(null, null, null, 1000); // Missing UserName and PanCard should throw an exception
+        }
+
+        [TestMethod]
+        public async Task DepositAsync_WithValidAmount_ShouldIncreaseBalance()
+        {
+            // Arrange
+            var result = await _accountService.DepositAsync("ACC001", 500);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(5500, result.Balance);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task DepositAsync_WithZeroAmount_ShouldThrowException()
+        {
+            await _accountService.DepositAsync("ACC001", 0); // Zero amount should throw an exception
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task DepositAsync_WithAmountGreaterThan10000_ShouldThrowException()
+        {
+            await _accountService.DepositAsync("ACC001", 11000); // Amount > 10000 should throw an exception
+        }
+
+        [TestMethod]
+        public async Task WithdrawAsync_WithValidAmount_ShouldDecreaseBalance()
+        {
+            var result = await _accountService.WithdrawAsync("ACC001", 500);
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4500, result.Balance);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task WithdrawAsync_WithAmountGreaterThan90PercentOfBalance_ShouldThrowException()
+        {
+            await _accountService.WithdrawAsync("ACC001", 4800); // Amount > 90% of balance should throw an exception
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task WithdrawAsync_WithBalanceLessThan100_ShouldThrowException()
+        {
+            await _accountService.WithdrawAsync("ACC002", 100); // Balance < 100 should throw an exception
+        }
+
+
+        [TestMethod]
+        public async Task GetAllAccountsAsync_ShouldReturnAllAccounts()
+        {
+            var accounts = await _accountService.GetAllAccountsAsync();
+
+            // Assert
+            Assert.IsNotNull(accounts);
+            Assert.AreEqual(3, accounts.Count()); // Assuming there are 3 accounts in the initial list
+        }
+
+
+        [TestMethod]
+        public async Task GetAccountAsync_WithValidAccountId_ShouldReturnAccount()
+        {
+            var account = await _accountService.GetAccountAsync("ACC001");
+
+            // Assert
+            Assert.IsNotNull(account);
+            Assert.AreEqual("ACC001", account.Id);
+        }
     }
 }

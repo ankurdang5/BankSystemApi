@@ -34,7 +34,7 @@ namespace BankSystem.Controllers
             }
         }
 
-        [HttpGet("GetAccount/{accountId:int}")]
+        [HttpGet("GetAccount/{accountId}")]
         public async Task<ActionResult<Account>> Account(string accountId)
         {
             try
@@ -64,9 +64,9 @@ namespace BankSystem.Controllers
                 {
                     return BadRequest("Invalid request data.");
                 }
-                var account = await _accountService.CreateAccountAsync(request.Id,request.UserName,request.PanCard, request.Balance);
+                var account = await _accountService.CreateAccountAsync(request.Id, request.UserName, request.PanCard, request.Balance);
 
-                return CreatedAtAction("GetAccount", new { accountId = account.Id }, account);
+                return CreatedAtAction("Account", new { accountId = account.Id }, account);
             }
             catch (Exception ex)
             {

@@ -1,16 +1,15 @@
-﻿using BankSystem.Models;
+﻿using BankSystem.Common;
+using BankSystem.Models;
 using System.Security.Principal;
 
 namespace BankSystem.Services
 {
     public class UserService : IUserService
     {
-        private readonly List<User> _user;
-        string nextUserId = "SBI004";
-
+        private readonly List<User> usersList;
         public UserService()
         {
-            _user = new List<User>
+            usersList = new List<User>
             {
                 // Initialize with mock data
                 { new User { Id = "SBI001", Name = "Ankur", PanCard = "ABCD" } },
@@ -23,7 +22,7 @@ namespace BankSystem.Services
         {
             try
             {
-                return await Task.FromResult(_user.FirstOrDefault(user => user.Id == userId));
+                return await Task.FromResult(usersList.FirstOrDefault(user => user.Id == userId));
             }
             catch (Exception)
             {
@@ -35,7 +34,7 @@ namespace BankSystem.Services
         {
             try
             {
-                // Create a new User object and populate its properties from the DTO
+                var nextUserId = Helper.GetNextUserId(usersList);
                 var newUser = new User
                 {
                     Id = nextUserId,
@@ -43,8 +42,7 @@ namespace BankSystem.Services
                     PanCard = user.PanCard
                 };
 
-                // Add the new user to the list
-                _user.Add(newUser);
+                usersList.Add(newUser);
                 return await Task.FromResult(newUser);
             }
             catch (Exception)

@@ -1,117 +1,66 @@
-//using BankSystem.Controllers;
-//using BankSystem.Models;
-//using BankSystem.Services;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.Extensions.Logging;
-//using Moq;
+using BankSystem.Controllers;
+using BankSystem.Models;
+using BankSystem.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-//namespace Tests
-//{
-//    [TestClass]
-//    public class AccountsControllerTests
-//    {
-//        [TestMethod]
-//        public async Task GetAccounts_ReturnsListOfAccounts()
-//        {
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger>();
-//            var controller = new AccountsController(accountService,logger);
-//            var result = await controller.Account();
-//            Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
-//            var okResult = (OkObjectResult)result.Result;
-//            var accounts = (IEnumerable<Account>)okResult.Value;
-//            Assert.IsNotNull(accounts);
-//        }
+namespace BankSystem.Tests
+{
+    [TestClass]
+    public class AccountsControllerTests
+    {
+        private AccountsController _controller;
+        private Mock<IAccountService> _accountServiceMock;
+        private Mock<ILogger<AccountsController>> _loggerMock;
 
-//        [TestMethod]
-//        public async Task GetAccount_ExistingAccountId_ReturnsAccount()
-//        {
-//            var accountId = 1;
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger>();
-//            var controller = new AccountsController(accountService, logger);
-//            var result = await controller.Account(accountId);
-//            var account = result.Value;
-//            Assert.IsInstanceOfType(account, typeof(Account));
-//        }
+        [TestInitialize]
+        public void Initialize()
+        {
+            _accountServiceMock = new Mock<IAccountService>();
+            _loggerMock = new Mock<ILogger<AccountsController>>();
+            _controller = new AccountsController(_accountServiceMock.Object, _loggerMock.Object);
+        }
+        [TestMethod]
+        public async Task GetAccounts_ShouldReturnListOfAccounts()
+        {
+            var accounts = new List<Account>
+    {
+        new Account { Id = "ACC001", User = new User { Id = "SBI001" }, Balance = 1000 },
+        new Account { Id = "ACC002", User = new User { Id = "SBI002" }, Balance = 2000 }
+    };
 
-//        [TestMethod]
-//        public async Task CreateAccount_ValidData_ReturnsCreatedAccount()
-//        {
-//            var request = new CreateAccountRequest
-//            {
-//                Name = "TestAccount",
-//                Balance = 1000.0m,
-//            };
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger<AccountsController>>();
-//            var controller = new AccountsController(accountService, logger);
-//            var result = await controller.Account(request);
-//            Assert.IsInstanceOfType(result.Result, typeof(CreatedAtActionResult));
-//            var createdAtResult = (CreatedAtActionResult)result.Result;
-//            Assert.AreEqual("GetAccount", createdAtResult.ActionName);
-//            var account = (Account)createdAtResult.Value;
-//            Assert.IsNotNull(account);
-//        }
+            _accountServiceMock.Setup(x => x.GetAllAccountsAsync()).ReturnsAsync(accounts);
 
-//        [TestMethod]
-//        public async Task UpdateAccount_ExistingAccountId_ReturnsAccount()
-//        {
-//            var accountId = 2;
-//            var request = new UpdateAccountRequest
-//            {
-//                Name = "TestAccount",
-//                Balance = 6969.0m,
-//            };
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger<AccountsController>>();
-//            var controller = new AccountsController(accountService, logger);
-//            var result = await controller.Account(accountId, request);
-//            var account = result.Value;
-//            Assert.IsInstanceOfType(account, typeof(Account));
-//        }
+            var result = await _controller.Account();
+            // Assert
+            var okResult = result.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            var returnedAccounts = okResult.Value as IEnumerable<Account>;
+            Assert.IsNotNull(returnedAccounts);
+            Assert.AreEqual(2, returnedAccounts.Count());
+        }
 
-//        [TestMethod]
-//        public async Task DeleteAccount_ExistingAccountId()
-//        {
-//            var accountId = 3;
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger<AccountsController>>();
-//            var controller = new AccountsController(accountService, logger);
-//            var result = await controller.Delete(accountId);
-//            Assert.IsInstanceOfType(result, typeof(NoContentResult));
-//        }
+        [TestMethod]
+        public async Task GetAccount_WithValidAccountId_ShouldReturnAccount()
+        {
+            // Arrange
+            var account = new Account { Id = "ACC001", User = new User { Id = "SBI001" }, Balance = 1000 };
+            _accountServiceMock.Setup(x => x.GetAccountAsync("ACC001")).ReturnsAsync(account);
 
-//        [TestMethod]
-//        public async Task DepositAccount_ExistingAccountId_ReturnsAccount()
-//        {
-//            var accountId = 1;
-//            var request = new DepositRequest
-//            {
-//                Amount = 2000.0m,
-//            };
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger<AccountsController>>();
-//            var controller = new AccountsController(accountService, logger);
-//            var result = await controller.Deposit(accountId, request);
-//            var account = result.Value;
-//            Assert.IsInstanceOfType(account, typeof(Account));
-//        }
+            // Act
+            var result = await _controller.Account("ACC001");
+            // Assert
+            Assert.IsNotNull(result.Value);
+            var returnedAccount = result.Value as Account;
+            Assert.IsNotNull(returnedAccount);
+            Assert.AreEqual("ACC001", returnedAccount.Id);
+        }
 
-//        [TestMethod]
-//        public async Task WithdrawAccount_ExistingAccountId_ReturnsAccount()
-//        {
-//            var accountId = 3;
-//            var request = new WithdrawRequest
-//            {
-//                Amount = 2000.0m,
-//            };
-//            var accountService = new AccountService();
-//            var logger = Mock.Of<ILogger<AccountsController>>();
-//            var controller = new AccountsController(accountService, logger);
-//            var result = await controller.Withdraw(accountId, request);
-//            var account = result.Value;
-//            Assert.IsInstanceOfType(account, typeof(Account));
-//        }
-//    }
-//}
+    }
+}
