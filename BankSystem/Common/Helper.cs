@@ -4,6 +4,13 @@ namespace BankSystem.Common
 {
     public static class Helper
     {
+        public const string InitialBalanceMinimumMessage = "Initial account balance must be at least $100.";
+        public const string PanCardOrNameRequiredMessage = "Pan card or name should be present";
+        public const string AccountNotFoundMessage = "Account not found";
+        public const string AmountShouldBeGreaterThanZeroMessage = "Amount should be greater than 0";
+        public const string WithdrawalLimitExceededMessage = "Cannot withdraw more than 90% of your total balance in a single transaction";
+        public const string AccountBalanceMinimumMessage = "Account balance cannot be less than $100";
+        public const string DepositLimitExceededMessage = "Cannot deposit more than $10,000 in a single transaction";
         public static string GetNextUserId(List<User> users)
         {
             if (users.Any())

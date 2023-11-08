@@ -37,10 +37,10 @@ namespace BankSystem.Services
         {
             try
             {
-                var accountdetail = await Task.FromResult(accountList.FirstOrDefault(x => x.Id == accountId));
+                var accountdetail = await Task.FromResult(accountList.SingleOrDefault(x => x.Id == accountId));
                 if (accountdetail == null)
                 {
-                    throw new InvalidOperationException("Account not found.");
+                    throw new InvalidOperationException(Helper.AccountNotFoundMessage);
                 }
                 return accountdetail;
             }
@@ -56,14 +56,14 @@ namespace BankSystem.Services
             {
                 if (balance < 100)
                 {
-                    throw new InvalidOperationException("Initial account balance must be at least $100.");
+                    throw new InvalidOperationException(Helper.InitialBalanceMinimumMessage);
                 }
                 User user = new User();
                 if (string.IsNullOrEmpty(userid))
                 {
                     if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(panCard))
                     {
-                        throw new InvalidOperationException("Pan card or name should be present");
+                        throw new InvalidOperationException(Helper.PanCardOrNameRequiredMessage);
                     }
                     user.Name = userName;
                     user.PanCard = panCard;
@@ -112,12 +112,12 @@ namespace BankSystem.Services
             {
                 if (amount <= 0)
                 {
-                    throw new InvalidOperationException("amount should be greater than 0");
+                    throw new InvalidOperationException(Helper.AmountShouldBeGreaterThanZeroMessage);
                 }
 
                 if (amount > 10000)
                 {
-                    throw new InvalidOperationException("Cannot deposit more than $10,000 in a single transaction.");
+                    throw new InvalidOperationException(Helper.DepositLimitExceededMessage);
                 }
 
                 var account = await GetAccountAsync(accountId);
@@ -137,18 +137,18 @@ namespace BankSystem.Services
             {
                 if (amount <= 0)
                 {
-                    throw new InvalidOperationException("Amount should be greater than 0.");
+                    throw new InvalidOperationException(Helper.AmountShouldBeGreaterThanZeroMessage);
                 }
                 var account = await GetAccountAsync(accountId);
 
 
                 if (amount > account.Balance * 0.9m)
                 {
-                    throw new InvalidOperationException("Cannot withdraw more than 90% of your total balance in a single transaction.");
+                    throw new InvalidOperationException(Helper.WithdrawalLimitExceededMessage);
                 }
                 if (account.Balance - amount < 100)
                 {
-                    throw new InvalidOperationException("Account balance cannot be less than $100.");
+                    throw new InvalidOperationException(Helper.AccountBalanceMinimumMessage);
                 }
                 account.Balance -= amount;
                 return await Task.FromResult(account);

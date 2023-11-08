@@ -22,7 +22,7 @@ namespace BankSystem.Services
         {
             try
             {
-                return await Task.FromResult(usersList.FirstOrDefault(user => user.Id == userId));
+                return await Task.FromResult(usersList.SingleOrDefault(user => user.Id == userId));
             }
             catch (Exception)
             {
