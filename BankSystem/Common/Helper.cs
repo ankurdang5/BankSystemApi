@@ -11,6 +11,7 @@ namespace BankSystem.Common
         public const string WithdrawalLimitExceededMessage = "Cannot withdraw more than 90% of your total balance in a single transaction";
         public const string AccountBalanceMinimumMessage = "Account balance cannot be less than $100";
         public const string DepositLimitExceededMessage = "Cannot deposit more than $10,000 in a single transaction";
+        public const string ValidUserId = "Please enter a valid User Id";
         public static string GetNextUserId(List<User> users)
         {
             if (users.Any())

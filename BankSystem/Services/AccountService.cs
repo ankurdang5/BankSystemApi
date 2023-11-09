@@ -67,6 +67,10 @@ namespace BankSystem.Services
                 else
                 {
                     user = await _userService.GetUserAsync(userid);
+                    if(user == null)
+                    {
+                        throw new InvalidOperationException(Helper.ValidUserId);
+                    }
                 }
                 var newAccountId = Helper.GetNextAccountID(accountList);
                 var account = new Account
@@ -89,7 +93,7 @@ namespace BankSystem.Services
         {
             try
             {
-                var accountToDelete = await Task.FromResult(accountList.FirstOrDefault(account => account.Id == accountId));
+                var accountToDelete = await Task.FromResult(accountList.Single(account => account.Id == accountId));
                 if (accountToDelete != null)
                 {
                     accountList.Remove(accountToDelete);
@@ -146,7 +150,7 @@ namespace BankSystem.Services
                     throw new InvalidOperationException(Helper.AccountBalanceMinimumMessage);
                 }
                 account.Balance -= amount;
-                return await Task.FromResult(account);
+                return account;
             }
             catch (Exception)
             {
