@@ -69,7 +69,7 @@ namespace BankSystem.Services
                     user = await _userService.GetUserAsync(userid);
                     if(user == null)
                     {
-                        throw new InvalidOperationException(Helper.ValidUserId);
+                        throw new InvalidOperationException(Helper.InValidUserId);
                     }
                 }
                 var newAccountId = Helper.GetNextAccountID(accountList);
